@@ -20,11 +20,12 @@ async def capture(q, stop):
         q.put_nowait(None)
 
 async def main():
-    q = asyncio.Queue(maxsize=1)
+    q = asyncio.Queue(maxsize=1) # raw frames
+    dets_q = asyncio.Queue(maxsize=1) # analyser.last results
     stop = asyncio.Event()
     await asyncio.gather(
         capture(q, stop), # Part in this file
-        compress_send(q, stop), # also includes the ML part as it is far simpler to add it there
+        compress_send(q, dets_q, stop), # also includes the ML part as it is far simpler to add it there
     )
 
 if __name__ == "__main__":

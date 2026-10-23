@@ -12,7 +12,7 @@ def encode(frame):
     ok, buf = cv2.imencode('.avif', frame, PARAMS) # compress
     return buf.tobytes() if ok else None
 
-async def compress_send(q, stop):
+async def compress_send(q, dets_q, stop):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
         while not stop.is_set():
@@ -20,6 +20,9 @@ async def compress_send(q, stop):
             result = await analyser(frame) # add the overlay
             if result is None:
                 break
+            if dets_q.full(): # keep only the latest results
+                dets_q.get_nowait()
+            dets_q.put_nowait(analyser.last)
             data = await asyncio.to_thread(encode, result)
             if data is None:
                 print("Encode failed")
