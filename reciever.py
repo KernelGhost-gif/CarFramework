@@ -14,7 +14,7 @@ try:
             print("Decode failed")
             continue
 
-        cv2.imshow("UDP video", frame) # remove this if you want to use it as an api, will rewuire heavy mods
+        cv2.imshow("UDP video", frame) # remove this if you want to use it as an api, will requirw heavy mods
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 except KeyboardInterrupt:
