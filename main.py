@@ -23,8 +23,8 @@ async def main():
     q = asyncio.Queue(maxsize=1)
     stop = asyncio.Event()
     await asyncio.gather(
-        capture(q, stop),
-        compress_send(q, stop),
+        capture(q, stop), # Part in this file
+        compress_send(q, stop), # also includes the ML part as it is far simpler to add it there
     )
 
 if __name__ == "__main__":
