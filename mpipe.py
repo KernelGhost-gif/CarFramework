@@ -11,10 +11,10 @@ CENTER = (0.35, 0.65)
 MODELS = {
     "detect": "yolov8n_ncnn_model",
     "pose": "yolov8n-pose_ncnn_model",
-}
+} # model selection
 
 
-def zone_of(cx):
+def zone_of(cx):   # zone selection for future processing
     if cx < CENTER[0]:
         return "left"
     if cx > CENTER[1]:
@@ -27,7 +27,7 @@ class Analyser:
         self.imgsz = imgsz
         self.conf = conf
         self.draw_zones = draw_zones
-        self.tasks = ["detect", "pose"] if mode == "both" else [mode]
+        self.tasks = ["detect", "pose"] if mode == "both" else [mode] # select mode
         self.models = {t: YOLO(MODELS[t], task=t) for t in self.tasks}
         self.last = []
         self._pool = ThreadPoolExecutor(max_workers=1)
@@ -40,7 +40,7 @@ class Analyser:
         dets = []
         for t in self.tasks:
             r = self.models[t](frame, imgsz=self.imgsz, conf=self.conf, verbose=False)[0]
-            canvas = r.plot(img=canvas, boxes=(t == "detect"))
+            canvas = r.plot(img=canvas, boxes=(t == "detect")) # draw the stuff
             if t != self.tasks[0] or r.boxes is None:
                 continue
             names = self.models[t].names
@@ -59,7 +59,7 @@ class Analyser:
                     "zone": zone_of(cx),
                     "height": float((y2 - y1) / h),
                 })
-        if self.draw_zones:
+        if self.draw_zones: # draw the stuff
             for f in CENTER:
                 x = int(f * w)
                 cv2.line(canvas, (x, 0), (x, h), (0, 255, 255), 1)
