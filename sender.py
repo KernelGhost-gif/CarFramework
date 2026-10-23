@@ -25,5 +25,10 @@ async def compress_send(q, stop):
                 print("Encode failed")
                 continue
             sock.sendto(data, DEST) # send the thing
+            if q.full():
+                q.get_nowait()
+            q.put_nowait(analyser.last)
     finally:
+        if q.full():
+            q.get_nowait()
         sock.close()
