@@ -1,5 +1,6 @@
 import asyncio
 import socket
+
 import cv2
 from mpipe import Analyser
 
@@ -9,7 +10,7 @@ PARAMS = [cv2.IMWRITE_AVIF_QUALITY, 50]
 analyser = Analyser()
 
 def encode(frame):
-    ok, buf = cv2.imencode('.avif', frame, PARAMS) # compress
+    ok, buf = cv2.imencode('.avif', frame, PARAMS)
     return buf.tobytes() if ok else None
 
 async def compress_send(q, dets_q, stop):
@@ -17,16 +18,16 @@ async def compress_send(q, dets_q, stop):
     try:
         while not stop.is_set():
             frame = await q.get()
-            result = await analyser(frame) # add the overlay
+            result = await analyser(frame)
             if result is None:
                 break
-            if dets_q.full(): # keep only the latest results
+            if dets_q.full():
                 dets_q.get_nowait()
             dets_q.put_nowait(analyser.last)
             data = await asyncio.to_thread(encode, result)
             if data is None:
                 print("Encode failed")
                 continue
-            sock.sendto(data, DEST) # send the thing
+            sock.sendto(data, DEST)
     finally:
         sock.close()

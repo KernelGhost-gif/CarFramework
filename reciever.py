@@ -3,7 +3,7 @@ import socket
 import numpy as np
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 4 * 1024 * 1024)  # bigger buffer for bursts
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 4 * 1024 * 1024)
 sock.bind(("0.0.0.0", 5005))
 
 try:
@@ -14,7 +14,7 @@ try:
             print("Decode failed")
             continue
 
-        cv2.imshow("UDP video", frame) # remove this if you want to use it as an api, will requirw heavy mods
+        cv2.imshow("UDP video", frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 except KeyboardInterrupt:

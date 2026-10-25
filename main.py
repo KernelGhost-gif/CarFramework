@@ -1,6 +1,9 @@
 import asyncio
+
 import cv2
 from sender import compress_send
+from trackhuman import track_human
+
 
 async def capture(q, stop):
     cap = cv2.VideoCapture(0)
@@ -20,12 +23,13 @@ async def capture(q, stop):
         q.put_nowait(None)
 
 async def main():
-    q = asyncio.Queue(maxsize=1) # raw frames
-    dets_q = asyncio.Queue(maxsize=1) # analyser.last results
+    q = asyncio.Queue(maxsize=1)
+    dets_q = asyncio.Queue(maxsize=1)
     stop = asyncio.Event()
     await asyncio.gather(
-        capture(q, stop), # Part in this file
-        compress_send(q, dets_q, stop), # also includes the ML part as it is far simpler to add it there
+        capture(q, stop),
+        compress_send(q, dets_q, stop),
+        track_human(dets_q, stop),
     )
 
 if __name__ == "__main__":
