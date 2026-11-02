@@ -6,9 +6,13 @@
   "main": "desktop/main.js",
   "scripts": {
     "build:receiver": "cargo build --release",
-    "start": "npm run build:receiver && electron ."
+    "start": "cargo build --release && electron .",
+    "postinstall": "bun node_modules/electron/install.js"
   },
   "devDependencies": {
     "electron": "^35.7.5"
-  }
+  },
+  "trustedDependencies": [
+    "electron"
+  ]
 }

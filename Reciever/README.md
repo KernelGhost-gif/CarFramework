@@ -5,11 +5,11 @@ An Electron desktop interface backed by a Rust UDP receiver for the CarFramework
 ## Requirements
 
 - Rust and Cargo.
-- Node.js and npm; Electron is installed locally by npm.
+- Bun; Electron is installed locally by Bun.
 - Python 3 with a version of `cryptography` that provides `MLKEM768`, `MLDSA44`, and `AESGCMSIV` (the same requirements as the existing framework).
 - The sender's trusted ML-DSA public key and the receiver's ML-DSA private key, in the existing raw formats.
 
-From this directory, run `npm install` and `npm start`. The latter builds the Rust process in release mode and launches Electron. Select the key files and, if necessary, enter the full path to the Python executable for the environment containing the dependency. Start the receiver before starting the sender; they must have network access to UDP ports 5005 and 5006. Update the sender's hard-coded destination IP to this computer's reachable address.
+From this directory, run `bun install` and `bun run start`. The latter builds the Rust process in release mode and launches Electron. Bun runs the Electron launcher without relying on the system Node installation; Electron itself uses its bundled runtime. Select the key files and, if necessary, enter the full path to the Python executable for the environment containing the dependency. Start the receiver before starting the sender; they must have network access to UDP ports 5005 and 5006. Update the sender's hard-coded destination IP to this computer's reachable address.
 
 For first-time key creation and public-key exchange, see the [key setup instructions](../README.md#first-time-key-setup).
 
