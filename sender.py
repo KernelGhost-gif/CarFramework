@@ -5,7 +5,7 @@ from mpipe import Analyser
 
 from encryption import mldsa_load_private_key, mldsa_load_public_key, sender_exchange, encrypt
 
-DEST = ("192.168.68.57", 5005)
+DEST = (input("Enter Mac Ip: "), 5005)
 PARAMS = [cv2.IMWRITE_AVIF_QUALITY, 50]
 
 analyser = Analyser()
