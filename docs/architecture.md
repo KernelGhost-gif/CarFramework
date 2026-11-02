@@ -5,7 +5,7 @@ CarFramework is a camera, inference and vehicle-control framework for Raspberry 
 ## Video and control
 
 - `main.py` captures frames with OpenCV, starts the sender and runs the control loop.
-- `mpipe.py` loads YOLOv26 nano detection and YOLOv8 nano pose NCNN models, performs inference and identifies a person's position.
+- `mpipe.py` loads the YOLOv26 nano detection and YOLOv8 nano pose NCNN models from `models/`, performs inference and identifies a person's position.
 - `sender.py` encodes frames as AVIF, encrypts them and sends them as UDP datagrams. It prompts for the receiver's IP address at startup.
 - `trackhuman.py` translates tracked positions into UDP commands for the configured UNO address. This path is separate from CarView and can be replaced for other vehicles. A `noai` file in the repository root disables model loading, inference and this control loop at startup; the sender streams the original frames instead.
 - `reciever.py` is the original OpenCV receiver. CarView is an alternative and cannot share the same listening ports simultaneously.

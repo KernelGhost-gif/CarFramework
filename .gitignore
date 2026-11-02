@@ -1,9 +1,35 @@
 __pycache__/
+*.py[cod]
 .venv/
+.DS_Store
+
+# Local tool caches and iterative training/inference outputs
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+wandb/
+runs/
+mlruns/
+lightning_logs/
+outputs/
+*.log
+
+# Build products and packaged artifacts
+build/
+dist/
+target/
+node_modules/
+*.egg-info/
+release/
+releases/
+
 # ML-DSA private keys
 sender_mldsa_sk.bin
 receiver_mldsa_sk.bin
 *.bin
+!models/
+!models/**/*.bin
 
 # Local camera-only mode
 /noai

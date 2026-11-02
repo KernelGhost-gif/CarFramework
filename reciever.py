@@ -1,16 +1,18 @@
 import cv2
 import socket
 import numpy as np
+from pathlib import Path
 
 from encryption import mldsa_load_public_key, mldsa_load_private_key, receiver_exchange, decrypt
 
 CONTROL_PORT = 5006
 VIDEO_PORT = 5005
+ROOT = Path(__file__).resolve().parent
 
 
 def main():
-    trusted_sender_pk = mldsa_load_public_key("sender_mldsa_pk.bin")
-    receiver_sk = mldsa_load_private_key("receiver_mldsa_sk.bin")
+    trusted_sender_pk = mldsa_load_public_key(str(ROOT / "sender_mldsa_pk.bin"))
+    receiver_sk = mldsa_load_private_key(str(ROOT / "receiver_mldsa_sk.bin"))
     key = receiver_exchange(trusted_sender_pk, receiver_sk)
     print("Encryption key established")
 
