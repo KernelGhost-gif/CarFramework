@@ -42,7 +42,7 @@ Exchange **only the public keys**, using a trusted method and verifying their au
 - Copy `receiver_mldsa_pk.bin` to the sender's CarFramework folder (or the directory from which `main.py` runs).
 - Keep `sender_mldsa_sk.bin` on the sender and `receiver_mldsa_sk.bin` on the receiver. Select the latter as the receiver private key in CarView. Never share or commit private keys.
 
-ML-KEM session keys are created during the connection; they do not need a separate setup command. The existing 192-byte nonce setting must be corrected consistently on both devices before encrypted video can work; see `Reciever/README.md`.
+ML-KEM session keys are created during the connection; they do not need a separate setup command. Both devices must use the same current version of `encryption.py`.
 
 ### Exchange the public keys over UDP
 

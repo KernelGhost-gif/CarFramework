@@ -13,8 +13,7 @@ def main():
     sys.path.insert(0, os.path.abspath(framework))
     try:
         import encryption
-        # AES-GCM-SIV specifies a 12-byte nonce. Do not pretend the current
-        # 192-byte setting can produce a working stream.
+        # Catch an incompatible older framework configuration before pairing.
         if encryption.NONCE_LEN != 12:
             raise ValueError(f"Framework NONCE_LEN is {encryption.NONCE_LEN}; AES-GCM-SIV requires 12 bytes. Update both sender and receiver together before streaming.")
         trusted = encryption.mldsa_load_public_key(sender_key)

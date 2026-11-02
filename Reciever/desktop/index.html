@@ -27,7 +27,7 @@
         <label for="receiver-key">Receiver private key</label><div class="file-row"><input id="receiver-key" readonly placeholder="No file selected"><button class="secondary" id="receiver-select">Browse</button></div>
         <label for="python">Python executable</label><input id="python" value="python3" spellcheck="false"><small class="hint">Use the Python environment that has the framework’s cryptography dependency installed.</small>
         <div class="actions"><button class="primary" id="start">Start receiver <span aria-hidden="true">→</span></button><button class="secondary" id="stop" disabled>Stop</button></div>
-        <div class="callout"><b>Protocol note</b><p>The current framework uses a 192-byte nonce, but AES-GCM-SIV requires 12 bytes. The sender and receiver must be updated together before streaming.</p></div>
+        <div class="callout"><b>Connection note</b><p>Use the same current version of the framework on both devices before streaming.</p></div>
       </section>
     </div>
   </main>
