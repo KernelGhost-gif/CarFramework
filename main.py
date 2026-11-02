@@ -1,4 +1,5 @@
 import asyncio
+from pathlib import Path
 
 import cv2
 from sender import compress_send
@@ -26,11 +27,12 @@ async def main():
     q = asyncio.Queue(maxsize=1)
     dets_q = asyncio.Queue(maxsize=1)
     stop = asyncio.Event()
-    await asyncio.gather(
-        capture(q, stop),
-        compress_send(q, dets_q, stop),
-        track_human(dets_q, stop),
-    )
+    ai_enabled = not Path(__file__).resolve().with_name("noai").is_file()
+    print("AI tracking enabled" if ai_enabled else "AI tracking disabled (noai file present)")
+    tasks = [capture(q, stop), compress_send(q, dets_q, stop, ai_enabled=ai_enabled)]
+    if ai_enabled:
+        tasks.append(track_human(dets_q, stop))
+    await asyncio.gather(*tasks)
 
 if __name__ == "__main__":
     try:

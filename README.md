@@ -1,56 +1,103 @@
-# Car Framework
-Unified framework for all RPI and UNO based cars that require CV
+# CarFramework
 
-## main.py
-Captures the frame, puts it in a async q to allow other functions from other files to use it
+Use a Raspberry Pi as the camera sender and CarView on another computer to view its video stream.
 
-Also calls the functions from other files and puts them in a async loop
+## 1. Prepare both computers
 
-## sender.py
-Compresses the file into AVIF format, encrypt it using encryption.py and sends it and also runs the detection loop
+Clone or update this repository on both devices, then open a terminal in the `CarFramework` folder on each. Use the same version of the repository on both devices.
 
-## encryption.py
-Generates keys using ML-KEM and signs the keys with ML-DSA to verrify source and authenticity, then uses AES256-GMCSIV to encrypt the image. Same stac, but in reverse for decryption
-
-## trackhuman.py
-uses the tracked location values to send controlls. This can be completely swapped out for other projects with other needs
-
-# Models:
-yolov8n-pose and yolov26n converted to NCNN from pytorch for speed reasons
-Project of distilling v26l into v8n has been canceled due to the vastly superior performance of v26n compared to tuned v8n
-
-# License:
-GNU LGPL-3.0
-
-## First-time key setup
-
-Each device needs its own ML-DSA identity. Install a Python `cryptography` version that supports ML-DSA and ML-KEM (47.0.0 or newer) on both devices. From the CarFramework folder, run the appropriate command **once on each device**:
+Both devices need Python 3.11 or newer and the project's cryptography dependency:
 
 ```bash
-# On the camera/sender device:
-python3 keygen.py sender
-
-# On the CarView/receiver device:
-python3 keygen.py receiver
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install 'cryptography>=47'
 ```
 
-The script writes raw key files in the CarFramework folder, refuses to overwrite existing files, and keeps private files accessible only to the current user on systems that support Unix file permissions. An existing directory can be selected with `--output-dir PATH`.
+Activate `.venv` again in each new terminal before running the Python commands below. On the CarView computer, you will also need [Bun](https://bun.sh/docs/installation) and [Rust and Cargo](https://www.rust-lang.org/tools/install).
 
-Exchange **only the public keys**, using a trusted method and verifying their authenticity:
+On the sender Pi, install the video and inference dependencies in the same environment (for camera-only mode, see below):
 
-- Copy `sender_mldsa_pk.bin` to the receiver device, and select it as the sender public key in CarView.
-- Copy `receiver_mldsa_pk.bin` to the sender's CarFramework folder (or the directory from which `main.py` runs).
-- Keep `sender_mldsa_sk.bin` on the sender and `receiver_mldsa_sk.bin` on the receiver. Select the latter as the receiver private key in CarView. Never share or commit private keys.
+```bash
+python -m pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+python -m pip install ncnn opencv-python ultralytics
+```
 
-ML-KEM session keys are created during the connection; they do not need a separate setup command. Both devices must use the same current version of `encryption.py`.
+With AI tracking enabled, the sender needs both `yolov26n_ncnn_model` and `yolov8n-pose_ncnn_model`, each with `model.ncnn.param` and `model.ncnn.bin`. The YOLOv8 pose weights may be absent after cloning; see [model setup and troubleshooting](docs/troubleshooting.md#model-files).
 
-### Exchange the public keys over UDP
+## 2. Generate and exchange keys
 
-After generating each device's own key pair as above, you can exchange the two public keys without `scp`. Both devices need `exchange_keys.py` and must be able to communicate over UDP port 5007 (or the same port selected with `--port`). Run the receiver first.
+Run these **once**, from the repository folder on the corresponding device:
 
-1. Generate a fresh pairing code on either device with `python3 -c 'import secrets; print(secrets.token_hex(32))'`. Share the code with the person at the other device through a trusted private channel. Use a new code for each pairing.
-2. On the CarView device, from the CarFramework folder, run `python3 exchange_keys.py receiver` and enter the code when prompted.
-3. Within two minutes, on the sender Pi run `python3 exchange_keys.py sender --peer CARVIEW_IP`, replacing `CARVIEW_IP` with the CarView device's IP address. Enter the same code.
-4. Select `sender_mldsa_pk.bin` and `receiver_mldsa_sk.bin` in CarView. The Pi automatically receives `receiver_mldsa_pk.bin` in its CarFramework folder.
+```bash
+# On the sender Pi
+python keygen.py sender
 
-Only public keys are sent. The code authenticates the exchange; it does not encrypt the public keys. Existing different public keys are never overwritten. If a transfer is interrupted, rerun both commands using a fresh code; a matching already-saved public key is accepted. Both devices must have their own key pair first. On systems with a firewall, permit UDP 5007 on the receiver.
+# On the CarView computer
+python keygen.py receiver
+```
+
+To exchange the public keys over UDP, generate a fresh pairing code on either device:
+
+```bash
+python -c 'import secrets; print(secrets.token_hex(32))'
+```
+
+Share the code privately with the other device. On the CarView computer, run this first and enter the code when prompted:
+
+```bash
+python exchange_keys.py receiver
+```
+
+On the Pi, run the following within two minutes, replacing `CARVIEW_IP` with the CarView computer's IP address, and enter the same code:
+
+```bash
+python exchange_keys.py sender --peer CARVIEW_IP
+```
+
+Only public keys are exchanged. Keep each `*_sk.bin` private key on the device that created it. See [key exchange troubleshooting](docs/troubleshooting.md#key-exchange) for firewall and retry instructions.
+
+## 3. Start CarView
+
+On the CarView computer:
+
+```bash
+cd Reciever
+bun install
+bun run start
+```
+
+You only need `bun install` on first setup or after dependencies change. Open the **Connection** tab; CarView looks for the keys automatically. If needed, browse to `sender_mldsa_pk.bin` and `receiver_mldsa_sk.bin`. Set **Python executable** to the full path to the Python in your `.venv` if `python3` does not have `cryptography` installed.
+
+Click **Start receiver**. The receiver waits up to 30 seconds for the sender.
+
+## 4. Start the sender
+
+On the Pi, from the repository folder with `.venv` active:
+
+```bash
+python main.py
+```
+
+When prompted for the Mac IP, enter the CarView computer's reachable IP address. The application captures from camera index 0. To stop, press **Ctrl+C** on the Pi and use **Stop** in CarView's Connection tab.
+
+### Camera-only mode
+
+To stream without AI detection, pose estimation or tracking commands, create an empty file named `noai` in the sender's CarFramework folder before starting the sender:
+
+```bash
+touch noai
+python main.py
+```
+
+This mode sends the unannotated camera feed and does not send vehicle-control commands. It does not load the AI models, so the AI-specific dependencies and model files are not needed. To re-enable AI tracking, remove the file and restart the sender:
+
+```bash
+rm noai
+python main.py
+```
+
+The file is ignored by Git. Changes take effect when the sender starts.
+
+See [troubleshooting](docs/troubleshooting.md) if the stream does not appear. For implementation details, see [architecture](docs/architecture.md).

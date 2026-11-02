@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const { spawn } = require('node:child_process');
 const path = require('node:path');
+const fs = require('node:fs/promises');
 const readline = require('node:readline');
 const root = path.resolve(__dirname, '..');
 let child = null;
@@ -17,6 +18,27 @@ function createWindow() {
   windowRef.loadFile(path.join(__dirname, 'index.html'));
   windowRef.on('closed', () => { stop(); windowRef = null; });
 }
+ipcMain.handle('find-keys', async () => {
+  // Prefer a complete pair from one directory; never inspect key contents here.
+  const directories = [...new Set([process.cwd(), path.resolve(root, '..'), root].map(dir => path.resolve(dir)))];
+  let partial = null;
+  for (const dir of directories) {
+    const candidates = {
+      senderKey: path.join(dir, 'sender_mldsa_pk.bin'),
+      receiverKey: path.join(dir, 'receiver_mldsa_sk.bin'),
+    };
+    const exists = await Promise.all(Object.values(candidates).map(async file => {
+      try { return (await fs.stat(file)).isFile(); } catch { return false; }
+    }));
+    const found = {
+      senderKey: exists[0] ? candidates.senderKey : null,
+      receiverKey: exists[1] ? candidates.receiverKey : null,
+    };
+    if (found.senderKey && found.receiverKey) return found;
+    if (!partial && (found.senderKey || found.receiverKey)) partial = found;
+  }
+  return partial || { senderKey: null, receiverKey: null };
+});
 ipcMain.handle('choose-file', async () => { const result = await dialog.showOpenDialog(windowRef, { properties: ['openFile'] }); return result.canceled ? null : result.filePaths[0]; });
 ipcMain.handle('start-receiver', (_, options) => {
   if (child) throw new Error('The receiver is already running.');

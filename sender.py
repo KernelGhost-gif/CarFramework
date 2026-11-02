@@ -1,14 +1,11 @@
 import asyncio
 import socket
 import cv2
-from mpipe import Analyser
 
 from encryption import mldsa_load_private_key, mldsa_load_public_key, sender_exchange, encrypt
 
 DEST = (input("Enter Mac Ip: "), 5005)
 PARAMS = [cv2.IMWRITE_AVIF_QUALITY, 50]
-
-analyser = Analyser()
 
 
 def encode(frame):
@@ -16,7 +13,11 @@ def encode(frame):
     return buf.tobytes() if ok else None
 
 
-async def compress_send(q, dets_q, stop):
+async def compress_send(q, dets_q, stop, ai_enabled=True):
+    analyser = None
+    if ai_enabled:
+        from mpipe import Analyser
+        analyser = Analyser()
     mldsa_sk = mldsa_load_private_key("sender_mldsa_sk.bin")
     receiver_pk = mldsa_load_public_key("receiver_mldsa_pk.bin")
     key = await asyncio.to_thread(sender_exchange, DEST[0], mldsa_sk, receiver_pk)
@@ -26,12 +27,17 @@ async def compress_send(q, dets_q, stop):
     try:
         while not stop.is_set():
             frame = await q.get()
-            result = await analyser(frame)
-            if result is None:
+            if frame is None:
                 break
-            if dets_q.full():
-                dets_q.get_nowait()
-            dets_q.put_nowait(analyser.last)
+            if analyser is None:
+                result = frame
+            else:
+                result = await analyser(frame)
+                if result is None:
+                    break
+                if dets_q.full():
+                    dets_q.get_nowait()
+                dets_q.put_nowait(analyser.last)
             data = await asyncio.to_thread(encode, result)
             if data is None:
                 print("Encode failed")
@@ -40,3 +46,4 @@ async def compress_send(q, dets_q, stop):
             sock.sendto(encrypted, DEST)
     finally:
         sock.close()
+        stop.set()

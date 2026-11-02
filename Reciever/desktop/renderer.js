@@ -2,6 +2,21 @@ const $ = id => document.getElementById(id);
 let frames = 0;
 let running = false;
 let errors = 0;
+let collapsedOnConnect = false;
+
+function setConnectionPanel(open) {
+  const panel = $('connection-panel');
+  const toggle = $('connection-toggle');
+  if (!open && panel.contains(document.activeElement)) toggle.focus();
+  panel.inert = !open;
+  $('connection-shell').classList.toggle('collapsed', !open);
+  toggle.setAttribute('aria-expanded', String(open));
+  toggle.setAttribute('aria-label', open ? 'Hide connection panel' : 'Show connection panel');
+  toggle.title = open ? 'Hide connection panel' : 'Show connection panel';
+}
+$('connection-toggle').addEventListener('click', () => {
+  setConnectionPanel($('connection-toggle').getAttribute('aria-expanded') !== 'true');
+});
 
 function setStatus(title, detail, state = '') {
   $('receiver-status').textContent = title;
@@ -25,10 +40,17 @@ for (const name of ['sender', 'receiver']) {
     if (selected) $(`${name}-key`).value = selected;
   });
 }
+// Do not overwrite a key the user selected while discovery was running.
+window.receiver.findKeys().then(keys => {
+  if (keys.senderKey && !$('sender-key').value) $('sender-key').value = keys.senderKey;
+  if (keys.receiverKey && !$('receiver-key').value) $('receiver-key').value = keys.receiverKey;
+  if (keys.senderKey && keys.receiverKey && !running) setStatus('Offline', 'Keys detected · ready to connect');
+}).catch(() => {});
+
 $('start').addEventListener('click', async () => {
   try {
     setRunning(true);
-    frames = 0; errors = 0;
+    frames = 0; errors = 0; collapsedOnConnect = false;
     $('frame-count').textContent = 'No frames received';
     setStatus('Starting', 'Preparing connection');
     await window.receiver.start({ senderKey: $('sender-key').value, receiverKey: $('receiver-key').value, python: $('python').value });
@@ -36,7 +58,7 @@ $('start').addEventListener('click', async () => {
 });
 $('stop').addEventListener('click', async () => {
   await window.receiver.stop();
-  setRunning(false); clearFeed(); setStatus('Offline', 'Stopped by user');
+  setRunning(false); clearFeed(); setStatus('Offline', 'Stopped by user'); setConnectionPanel(true);
 });
 window.receiver.onEvent(event => {
   if (event.type === 'frame') {
@@ -49,15 +71,16 @@ window.receiver.onEvent(event => {
   } else if (event.type === 'status') {
     const connected = event.message.startsWith('Connected');
     setStatus(connected ? 'Connected' : 'Listening', event.message, connected ? 'connected' : '');
+    if (connected && !collapsedOnConnect) { collapsedOnConnect = true; setConnectionPanel(false); }
   } else if (event.type === 'frame_error') {
     errors++;
     setStatus('Frame error', `${event.message} (${errors} failed)`, 'error');
   } else if (event.type === 'error') {
-    setStatus('Error', event.message, 'error');
+    setStatus('Error', event.message, 'error'); setConnectionPanel(true);
   } else if (event.type === 'diagnostic') {
     setStatus('Receiver', event.message, 'error');
   } else if (event.type === 'stopped' && running) {
-    setRunning(false); clearFeed();
+    setRunning(false); clearFeed(); setConnectionPanel(true);
     if ($('receiver-status').textContent !== 'Error') setStatus('Offline', event.message);
   }
 });
