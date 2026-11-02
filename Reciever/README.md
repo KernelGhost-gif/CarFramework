@@ -13,8 +13,8 @@ From this directory, run `npm install` and `npm start`. The latter builds the Ru
 
 For first-time key creation and public-key exchange, see the [key setup instructions](../README.md#first-time-key-setup).
 
-## Current protocol blocker
+## Connection notes
 
-The repository currently sets `NONCE_LEN = 192` in `encryption.py`; AES-GCM-SIV requires a **12-byte** nonce. Consequently the original sender cannot encrypt frames, and this app reports the problem rather than claiming a connection. Change the protocol consistently on both the sender and receiver copies before expecting a video stream. This app does not change the framework's protocol. Large frames may also exceed UDP's maximum datagram size because the sender does not fragment them. Do not run this app and `reciever.py` on the same ports simultaneously.
+Both devices must use the current `encryption.py`, which uses the 12-byte nonce required by AES-GCM-SIV. Older versions with a 192-byte nonce are incompatible. Large frames may exceed UDP's maximum datagram size because the sender does not fragment them. Do not run this app and `reciever.py` on the same ports simultaneously.
 
 The receiver has not been tested against live hardware. It does not connect to robot controls or the WebSocket dashboard from the pull request.
