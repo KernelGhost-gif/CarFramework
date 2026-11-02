@@ -43,3 +43,14 @@ Exchange **only the public keys**, using a trusted method and verifying their au
 - Keep `sender_mldsa_sk.bin` on the sender and `receiver_mldsa_sk.bin` on the receiver. Select the latter as the receiver private key in CarView. Never share or commit private keys.
 
 ML-KEM session keys are created during the connection; they do not need a separate setup command. The existing 192-byte nonce setting must be corrected consistently on both devices before encrypted video can work; see `Reciever/README.md`.
+
+### Exchange the public keys over UDP
+
+After generating each device's own key pair as above, you can exchange the two public keys without `scp`. Both devices need `exchange_keys.py` and must be able to communicate over UDP port 5007 (or the same port selected with `--port`). Run the receiver first.
+
+1. Generate a fresh pairing code on either device with `python3 -c 'import secrets; print(secrets.token_hex(32))'`. Share the code with the person at the other device through a trusted private channel. Use a new code for each pairing.
+2. On the CarView device, from the CarFramework folder, run `python3 exchange_keys.py receiver` and enter the code when prompted.
+3. Within two minutes, on the sender Pi run `python3 exchange_keys.py sender --peer CARVIEW_IP`, replacing `CARVIEW_IP` with the CarView device's IP address. Enter the same code.
+4. Select `sender_mldsa_pk.bin` and `receiver_mldsa_sk.bin` in CarView. The Pi automatically receives `receiver_mldsa_pk.bin` in its CarFramework folder.
+
+Only public keys are sent. The code authenticates the exchange; it does not encrypt the public keys. Existing different public keys are never overwritten. If a transfer is interrupted, rerun both commands using a fresh code; a matching already-saved public key is accepted. Both devices must have their own key pair first. On systems with a firewall, permit UDP 5007 on the receiver.
