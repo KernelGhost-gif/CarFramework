@@ -36,3 +36,19 @@ servo toward 0°, center holds 90°, and right moves toward 180°. It discovers 
 first controller and the UNO automatically. Press Ctrl+C to stop; the servo
 holds its last position. If you want to limit travel for your linkage, adjust
 the angle mapping in `Arduino/mac_dualsense_servo.py` before running it.
+
+## Native Swift option
+
+The Swift bridge uses Apple's **Game Controller** framework to read the
+DualSense and **Core Bluetooth** to send angles directly to the UNO. It uses
+the same stick mapping and BLE service, so run either Mac bridge at a time.
+Pair the controller and run this from the repository root:
+
+```sh
+./Arduino/run_swift_bridge.sh
+```
+
+The script builds a small app bundle in the system temporary folder, with the
+Bluetooth usage description required by macOS, then launches it in Terminal.
+Approve the Bluetooth access prompt if macOS shows one. Apple's framework
+provides the controller's extended gamepad profile and thumbstick input.
