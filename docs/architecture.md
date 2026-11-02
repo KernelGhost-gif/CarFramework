@@ -4,12 +4,12 @@ CarFramework is a camera, inference and vehicle-control framework for Raspberry 
 
 ## Video and control
 
-- `main.py` captures frames with OpenCV, starts the sender and runs the control loop.
-- `mpipe.py` loads the YOLOv26 nano detection and YOLOv8 nano pose NCNN models from `models/`, performs inference and identifies a person's position.
-- `sender.py` encodes frames as AVIF, encrypts them and sends them as UDP datagrams. It prompts for the receiver's IP address at startup.
-- `trackhuman.py` translates tracked positions into UDP commands for the configured UNO address. This path is separate from CarView and can be replaced for other vehicles. A `noai` file in the repository root disables model loading, inference and this control loop at startup; the sender streams the original frames instead.
+- `Pi 5/main.py` captures frames with OpenCV, starts the sender and runs the control loop.
+- `Pi 5/mpipe.py` loads the YOLOv26 nano detection and YOLOv8 nano pose NCNN models from root `models/`, performs inference and identifies a person's position.
+- `Pi 5/sender.py` encodes frames as AVIF, encrypts them using `Pi 5/encryption.py`, and sends them as UDP datagrams. It prompts for the receiver's IP address at startup.
+- `Pi 5/trackhuman.py` translates tracked positions into UDP commands for the configured UNO address. This path is separate from CarView and can be replaced for other vehicles. A root `noai` file disables model loading, inference and this control loop at startup; the sender streams the original frames instead.
 - `reciever.py` is the original OpenCV receiver. CarView is an alternative and cannot share the same listening ports simultaneously.
-- `Reciever/src/main.rs` receives video datagrams, while `Reciever/worker/crypto_worker.py` uses the framework's Python cryptography code. Electron displays the decoded AVIF images and connection controls.
+- `Reciever/src/main.rs` receives video datagrams, while `Reciever/worker/crypto_worker.py` uses `Pi 5/encryption.py`. Electron displays the decoded AVIF images and connection controls.
 
 The model files are exported from PyTorch to NCNN for deployment. An earlier YOLOv26-large-to-YOLOv8-nano distillation experiment was discontinued after comparison with YOLOv26 nano.
 

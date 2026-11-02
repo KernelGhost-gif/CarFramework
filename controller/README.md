@@ -18,7 +18,7 @@ horn so its center position (90°) is mechanically safe.
 
 In Arduino IDE, install **ArduinoBLE** and **Servo** from Library Manager,
 select **Arduino UNO R4 WiFi**, then upload
-`UnoR4BleEcho/UnoR4BleEcho.ino`. The board advertises as `UNO-R4-Servo`.
+`../Arduino/UnoR4BleEcho/UnoR4BleEcho.ino`. The board advertises as `UNO-R4-Servo`.
 
 ## Connect the DualSense and run the Mac bridge
 
@@ -28,14 +28,14 @@ environment, then start the bridge:
 
 ```sh
 source .venv/bin/activate
-python Arduino/mac_dualsense_servo.py
+python controller/mac_dualsense_servo.py
 ```
 
 The client uses the DualSense **left stick's horizontal axis**: left moves the
 servo toward 0°, center holds 90°, and right moves toward 180°. It discovers the
 first controller and the UNO automatically. Press Ctrl+C to stop; the servo
 holds its last position. If you want to limit travel for your linkage, adjust
-the angle mapping in `Arduino/mac_dualsense_servo.py` before running it.
+the angle mapping in `controller/mac_dualsense_servo.py` before running it.
 
 ## Native Swift option
 
@@ -45,7 +45,7 @@ the same stick mapping and BLE service, so run either Mac bridge at a time.
 Pair the controller and run this from the repository root:
 
 ```sh
-./Arduino/run_swift_bridge.sh
+./controller/run_swift_bridge.sh
 ```
 
 The script builds a small app bundle in the system temporary folder, with the

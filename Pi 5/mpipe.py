@@ -10,8 +10,8 @@ MODE = "both"
 IMGSZ = 320
 CENTER = (0.35, 0.65)
 MODELS = {
-    "detect": str(Path(__file__).resolve().parent / "models" / "yolov26n_ncnn_model"),
-    "pose": str(Path(__file__).resolve().parent / "models" / "yolov8n-pose_ncnn_model"),
+    "detect": str(Path(__file__).resolve().parent.parent / "models" / "yolov26n_ncnn_model"),
+    "pose": str(Path(__file__).resolve().parent.parent / "models" / "yolov8n-pose_ncnn_model"),
 }
 
 
