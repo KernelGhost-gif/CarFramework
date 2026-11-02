@@ -6,25 +6,16 @@ Use a Raspberry Pi as the camera sender and CarView on another computer to view 
 
 Clone or update this repository on both devices, then open a terminal in the `CarFramework` folder on each. Use the same version of the repository on both devices.
 
-Both devices need Python 3.11 or newer and the project's cryptography dependency:
+Both devices need Python 3.11 or newer. From the repository root on each device, run the setup script to create `.venv` and install the Python dependencies used by the sender, receiver, and Arduino controller bridge:
 
 ```bash
-python3 -m venv .venv
+./setup.sh
 source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install 'cryptography>=47'
 ```
 
-Activate `.venv` again in each new terminal before running the Python commands below. On the CarView computer, you will also need [Bun](https://bun.sh/docs/installation) and [Rust and Cargo](https://www.rust-lang.org/tools/install).
+Activate `.venv` again in each new terminal before running Python commands. The setup script installs CarView's Bun packages when Bun is available. On the CarView computer, also install [Bun](https://bun.sh/docs/installation) and [Rust and Cargo](https://www.rust-lang.org/tools/install); if Bun was not available during setup, run `cd Reciever && bun install` once from the repository root.
 
-On the sender Pi, install the video and inference dependencies in the same environment (for camera-only mode, see below):
-
-```bash
-python -m pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-python -m pip install ncnn opencv-python ultralytics
-```
-
-With AI tracking enabled, the sender needs both `yolov26n_ncnn_model` and `yolov8n-pose_ncnn_model`, each with `model.ncnn.param` and `model.ncnn.bin`. The YOLOv8 pose weights may be absent after cloning; see [model setup and troubleshooting](docs/troubleshooting.md#model-files).
+With AI tracking enabled, the sender needs both `models/yolov26n_ncnn_model` and `models/yolov8n-pose_ncnn_model`, each with `model.ncnn.param` and `model.ncnn.bin`. The YOLOv8 pose weights may be absent after cloning; see [model setup and troubleshooting](docs/troubleshooting.md#model-files).
 
 ## 2. Generate and exchange keys
 
@@ -60,12 +51,10 @@ Only public keys are exchanged. Keep each `*_sk.bin` private key on the device t
 
 ## 3. Start CarView
 
-On the CarView computer:
+On the CarView computer, from the repository root:
 
 ```bash
-cd Reciever
-bun install
-bun run start
+(cd Reciever && bun run start)
 ```
 
 You only need `bun install` on first setup or after dependencies change. Open the **Connection** tab; CarView looks for the keys automatically. If needed, browse to `sender_mldsa_pk.bin` and `receiver_mldsa_sk.bin`. Set **Python executable** to the full path to the Python in your `.venv` if `python3` does not have `cryptography` installed.
@@ -74,7 +63,7 @@ Click **Start receiver**. The receiver waits up to 30 seconds for the sender.
 
 ## 4. Start the sender
 
-On the Pi, from the repository folder with `.venv` active:
+On the Pi, from the repository root with `.venv` active:
 
 ```bash
 python main.py
@@ -99,5 +88,13 @@ python main.py
 ```
 
 The file is ignored by Git. Changes take effect when the sender starts.
+
+### Arduino controller bridge
+
+The setup script also installs the Python packages for the optional DualSense-to-UNO BLE bridge. With the UNO sketch uploaded and the controller paired, launch the bridge from the repository root:
+
+```bash
+python Arduino/mac_dualsense_servo.py
+```
 
 See [troubleshooting](docs/troubleshooting.md) if the stream does not appear. For implementation details, see [architecture](docs/architecture.md).

@@ -1,0 +1,7 @@
+cryptography>=47
+opencv-python
+numpy
+ncnn
+ultralytics
+bleak
+pygame

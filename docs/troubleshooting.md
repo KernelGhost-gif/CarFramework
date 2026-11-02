@@ -21,14 +21,14 @@ Do not run the original `reciever.py` and CarView receiver simultaneously on the
 
 ## Model files
 
-The sender expects `model.ncnn.param` and `model.ncnn.bin` in both model directories. The repository's ignore rules exclude ordinary `.bin` files, so the YOLOv8 pose weights may be missing from a fresh clone. Obtain the matching model weights from a trusted copy or re-export the model. For example, with the sender's Ultralytics environment active:
+The sender expects `model.ncnn.param` and `model.ncnn.bin` in `models/yolov26n_ncnn_model` and `models/yolov8n-pose_ncnn_model`. The root ignore rules exclude ordinary `.bin` files while explicitly allowing files under `models/`; if the YOLOv8 pose weights are missing from a fresh clone, obtain matching weights from a trusted copy or re-export the model. For example, with the sender's Ultralytics environment active:
 
 ```bash
 yolo export model=yolov8n-pose.pt format=ncnn imgsz=320
 ```
 
-Check that the resulting `yolov8n-pose_ncnn_model` directory contains both files. Keep model parameters and weights from the same export together. The PyTorch `.pt` file used for export is not needed for NCNN inference.
+Check that the resulting `yolov8n-pose_ncnn_model` directory contains both files, then place it under `models/`. Keep model parameters and weights from the same export together. The PyTorch `.pt` file used for export is not needed for NCNN inference.
 
 ## CarView and Bun
 
-From `Reciever`, run `bun install` once and `bun run start`. The start command builds the Rust receiver and opens Electron. CarView uses Bun for setup and its launcher; Electron uses its own bundled runtime. Run `bun install` again after dependency changes. If a build fails, check that Bun, Rust and Cargo are available in the terminal's PATH.
+From the repository root, run `(cd Reciever && bun run start)`. The start command builds the Rust receiver and opens Electron. CarView uses Bun for setup and its launcher; Electron uses its own bundled runtime. Run `(cd Reciever && bun install)` once or after dependency changes. If a build fails, check that Bun, Rust and Cargo are available in the terminal's PATH.

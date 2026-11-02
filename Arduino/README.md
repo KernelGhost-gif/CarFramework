@@ -22,18 +22,17 @@ select **Arduino UNO R4 WiFi**, then upload
 
 ## Connect the DualSense and run the Mac bridge
 
-Pair the DualSense to macOS in **System Settings → Bluetooth**. Then, from this
-folder, install dependencies and start the bridge:
+Pair the DualSense to macOS in **System Settings → Bluetooth**. From the
+CarFramework repository root, run `./setup.sh` once, activate the root
+environment, then start the bridge:
 
 ```sh
-python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install bleak pygame
-python mac_dualsense_servo.py
+python Arduino/mac_dualsense_servo.py
 ```
 
 The client uses the DualSense **left stick's horizontal axis**: left moves the
 servo toward 0°, center holds 90°, and right moves toward 180°. It discovers the
 first controller and the UNO automatically. Press Ctrl+C to stop; the servo
 holds its last position. If you want to limit travel for your linkage, adjust
-the angle mapping in `mac_dualsense_servo.py` before running it.
+the angle mapping in `Arduino/mac_dualsense_servo.py` before running it.

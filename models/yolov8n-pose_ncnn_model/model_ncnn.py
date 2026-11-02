@@ -8,8 +8,10 @@ def test_inference():
     out = []
 
     with ncnn.Net() as net:
-        net.load_param("yolov8n-pose_ncnn_model/model.ncnn.param")
-        net.load_model("yolov8n-pose_ncnn_model/model.ncnn.bin")
+        from pathlib import Path
+        model_dir = Path(__file__).resolve().parent
+        net.load_param(str(model_dir / "model.ncnn.param"))
+        net.load_model(str(model_dir / "model.ncnn.bin"))
 
         with net.create_extractor() as ex:
             ex.input("in0", ncnn.Mat(in0.squeeze(0).numpy()).clone())
