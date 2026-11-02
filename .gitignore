@@ -4,3 +4,6 @@ __pycache__/
 sender_mldsa_sk.bin
 receiver_mldsa_sk.bin
 *.bin
+
+# Local camera-only mode
+/noai
