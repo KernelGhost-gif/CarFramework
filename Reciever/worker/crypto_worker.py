@@ -11,6 +11,7 @@ def emit(message):
 def main():
     framework, sender_key, receiver_key = sys.argv[1:]
     sys.path.insert(0, os.path.abspath(framework))
+    sys.path.insert(0, os.path.join(os.path.abspath(framework), "Pi 5"))
     try:
         import encryption
         # Catch an incompatible older framework configuration before pairing.

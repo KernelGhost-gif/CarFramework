@@ -12,7 +12,7 @@
 1. Open CarView's Connection tab and check the detected public and private key paths. The app searches the launch directory and project folders and prefers a complete pair from the same folder. You can select different files.
 2. If CarView cannot import `cryptography`, set its Python executable to the Python from the environment where the dependency is installed. For the example in the operating guide, that is the repository's `.venv/bin/python` on macOS or Linux.
 3. Start CarView's receiver first, then start the Pi sender within 30 seconds. Both devices need network access to the CarView computer on UDP ports 5005 and 5006. Enter the CarView computer's reachable IP address when the sender prompts for it.
-4. Both devices need the current `encryption.py`. Older versions with a 192-byte nonce are incompatible with AES-GCM-SIV and with the current 12-byte protocol.
+4. Both devices need the current `Pi 5/encryption.py`. Older versions with a 192-byte nonce are incompatible with AES-GCM-SIV and with the current 12-byte protocol.
 5. Check the Pi's terminal for camera, dependency or model errors. The sender opens camera index 0. A Raspberry Pi camera module may need a different capture setup from a USB camera.
 6. Verify AVIF encoding with `python -c "import cv2; print(cv2.haveImageWriter('.avif'))"`. The sender requires an OpenCV build with AVIF support.
 7. An encrypted frame larger than the UDP datagram limit cannot be sent by the current sender. Reduce the capture resolution or encoding quality if the sender reports a message-size error.

@@ -27,7 +27,8 @@ async def main():
     q = asyncio.Queue(maxsize=1)
     dets_q = asyncio.Queue(maxsize=1)
     stop = asyncio.Event()
-    ai_enabled = not Path(__file__).resolve().with_name("noai").is_file()
+    project_root = Path(__file__).resolve().parent.parent
+    ai_enabled = not (project_root / "noai").is_file()
     print("AI tracking enabled" if ai_enabled else "AI tracking disabled (noai file present)")
     tasks = [capture(q, stop), compress_send(q, dets_q, stop, ai_enabled=ai_enabled)]
     if ai_enabled:

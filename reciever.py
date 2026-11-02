@@ -2,7 +2,9 @@ import cv2
 import socket
 import numpy as np
 from pathlib import Path
+import sys
 
+sys.path.insert(0, str(Path(__file__).resolve().parent / "Pi 5"))
 from encryption import mldsa_load_public_key, mldsa_load_private_key, receiver_exchange, decrypt
 
 CONTROL_PORT = 5006

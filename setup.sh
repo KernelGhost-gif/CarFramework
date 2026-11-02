@@ -32,7 +32,7 @@ Python setup complete. Activate the environment with:
   source "$VENV/bin/activate"
 
 Start the sender from the repository root with:
-  python main.py
+  python "Pi 5/main.py"
 
 Start CarView from the repository root with:
   (cd Reciever && bun run start)

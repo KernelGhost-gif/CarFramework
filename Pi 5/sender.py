@@ -7,7 +7,7 @@ from encryption import mldsa_load_private_key, mldsa_load_public_key, sender_exc
 
 DEST = (input("Enter Mac Ip: "), 5005)
 PARAMS = [cv2.IMWRITE_AVIF_QUALITY, 50]
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 
 
 def encode(frame):
