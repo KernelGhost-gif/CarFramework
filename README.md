@@ -51,7 +51,13 @@ Only public keys are exchanged. Keep each `*_sk.bin` private key on the device t
 
 ## 3. Start CarView
 
-On the CarView computer, from the repository root:
+On a macOS CarView computer, you can start CarView and the native Swift controller bridge together from the repository root (requires Java 11 or newer):
+
+```bash
+java launcher/ClientLauncher.java
+```
+
+See the [client launcher guide](launcher/README.md) for prerequisites and controller setup. To start CarView alone, run:
 
 ```bash
 (cd Reciever && bun run start)
@@ -96,5 +102,7 @@ The setup script also installs the Python packages for the optional DualSense-to
 ```bash
 python controller/mac_dualsense_servo.py
 ```
+
+To send servo angles manually without a controller, use the [Kotlin Arduino debugger](launcher/README.md#arduino-command-debugger).
 
 See [troubleshooting](docs/troubleshooting.md) if the stream does not appear. For implementation details, see [architecture](docs/architecture.md).
