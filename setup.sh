@@ -2,38 +2,18 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PYTHON="${PYTHON:-python3}"
-VENV="$ROOT/.venv"
+export ROOT
+export PYTHON="${PYTHON:-python3}"
+export VENV="$ROOT/.venv"
 
-if ! command -v "$PYTHON" >/dev/null 2>&1; then
-  echo "Python 3 was not found. Set PYTHON to its executable and rerun." >&2
+if ! command -v clang >/dev/null 2>&1; then
+  echo "Clang was not found. Install Clang and rerun setup." >&2
   exit 1
 fi
 
-"$PYTHON" -m venv "$VENV"
-"$VENV/bin/python" -m pip install --upgrade pip
-# Use the CPU wheels for the Raspberry Pi/Linux sender environment.
-if [[ "$(uname -s)" == "Linux" ]]; then
-  "$VENV/bin/python" -m pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-else
-  "$VENV/bin/python" -m pip install torch torchvision
-fi
-"$VENV/bin/python" -m pip install -r "$ROOT/requirements.txt"
-
-if command -v bun >/dev/null 2>&1; then
-  (cd "$ROOT/Reciever" && bun install)
-else
-  echo "Bun not found; skipping CarView JavaScript dependencies. Install Bun, then run: cd Reciever && bun install"
-fi
-
-cat <<EOF
-
-Python setup complete. Activate the environment with:
-  source "$VENV/bin/activate"
-
-Start the sender from the repository root with:
-  python "Pi 5/main.py"
-
-Start CarView from the repository root with:
-  (cd Reciever && bun run start)
-EOF
+BUILD_DIR="$(mktemp -d "${TMPDIR:-/tmp}/carframework-setup.XXXXXXXX")"
+trap 'rm -rf "$BUILD_DIR"' EXIT
+printf '%s\n' 'Compiling the BrainSh setup interpreter...'
+clang -std=c99 -Wall -Wextra -pedantic "$ROOT/Setup/brainsh.c" -o "$BUILD_DIR/brainsh"
+export BRAINSH="$BUILD_DIR/brainsh"
+"$BRAINSH" --allow-shell "$ROOT/Setup/setup.bsh"

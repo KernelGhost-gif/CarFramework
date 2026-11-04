@@ -6,7 +6,7 @@ Use a Raspberry Pi as the camera sender and CarView on another computer to view 
 
 Clone or update this repository on both devices, then open a terminal in the `CarFramework` folder on each. Use the same version of the repository on both devices.
 
-Both devices need Python 3.11 or newer. From the repository root on each device, run the setup script to create `.venv` and install the Python dependencies used by the sender, receiver, and Arduino controller bridge:
+Both devices need Python 3.11 or newer and Clang. The setup script compiles the BrainSh interpreter and runs `Setup/setup.bsh`, which launches `setup.bf` to perform the installation. From the repository root on each device, run the setup script to create `.venv` and install the Python dependencies used by the sender, receiver, and Arduino controller bridge:
 
 ```bash
 ./setup.sh
