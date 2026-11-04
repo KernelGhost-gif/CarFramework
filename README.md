@@ -15,7 +15,7 @@ source .venv/bin/activate
 
 Activate `.venv` again in each new terminal before running Python commands. The setup script installs CarView's Bun packages when Bun is available. On the CarView computer, also install [Bun](https://bun.sh/docs/installation) and [Rust and Cargo](https://www.rust-lang.org/tools/install); if Bun was not available during setup, run `cd Reciever && bun install` once from the repository root.
 
-The Raspberry Pi sender code is grouped in `Pi 5/`. With AI tracking enabled, it needs both `models/yolov26n_ncnn_model` and `models/yolov8n-pose_ncnn_model`, each with `model.ncnn.param` and `model.ncnn.bin`. The YOLOv8 pose weights may be absent after cloning; see [model setup and troubleshooting](docs/troubleshooting.md#model-files).
+The Raspberry Pi sender code is grouped in `Pi5/`. With AI tracking enabled, it needs both `models/yolov26n_ncnn_model` and `models/yolov8n-pose_ncnn_model`, each with `model.ncnn.param` and `model.ncnn.bin`. The YOLOv8 pose weights may be absent after cloning; see [model setup and troubleshooting](docs/troubleshooting.md#model-files).
 
 ## 2. Generate and exchange keys
 
@@ -72,7 +72,7 @@ Click **Start receiver**. The receiver waits up to 30 seconds for the sender.
 On the Pi, from the repository root with `.venv` active:
 
 ```bash
-python "Pi 5/main.py"
+python "Pi5/main.py"
 ```
 
 When prompted for the Mac IP, enter the CarView computer's reachable IP address. The application captures from camera index 0. To stop, press **Ctrl+C** on the Pi and use **Stop** in CarView's Connection tab.
@@ -83,14 +83,14 @@ To stream without AI detection, pose estimation or tracking commands, create an 
 
 ```bash
 touch noai
-python "Pi 5/main.py"
+python "Pi5/main.py"
 ```
 
 This mode sends the unannotated camera feed and does not send vehicle-control commands. It does not load the AI models, so the AI-specific dependencies and model files are not needed. To re-enable AI tracking, remove the file and restart the sender:
 
 ```bash
 rm noai
-python "Pi 5/main.py"
+python "Pi5/main.py"
 ```
 
 The file is ignored by Git. Changes take effect when the sender starts.

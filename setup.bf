@@ -16,4 +16,4 @@
 !{printf '%s\n' 'Installing Python requirements...'}
 !{"$VENV/bin/python" -m pip install -r "$ROOT/requirements.txt"}
 !{if command -v bun >/dev/null 2>&1; then printf '%s\n' 'Installing CarView JavaScript dependencies...'; cd "$ROOT/Reciever" && bun install; else printf '%s\n' 'Bun not found; skipping CarView JavaScript dependencies. Install Bun, then run: cd Reciever && bun install'; fi}
-!{printf '\nPython setup complete. Activate the environment with:\n  source "%s/bin/activate"\n\nStart the sender from the repository root with:\n  python "Pi 5/main.py"\n\nStart CarView from the repository root with:\n  (cd Reciever && bun run start)\n' "$VENV"}
+!{printf '\nPython setup complete. Activate the environment with:\n  source "%s/bin/activate"\n\nStart the sender from the repository root with:\n  python "Pi5/main.py"\n\nStart CarView from the repository root with:\n  (cd Reciever && bun run start)\n' "$VENV"}
