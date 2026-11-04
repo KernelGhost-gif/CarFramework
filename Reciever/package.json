@@ -1,0 +1,18 @@
+{
+  "name": "carview",
+  "version": "0.1.0",
+  "private": true,
+  "description": "CarView desktop receiver for CarFramework",
+  "main": "desktop/main.js",
+  "scripts": {
+    "build:receiver": "cargo build --release",
+    "start": "cargo build --release && electron .",
+    "postinstall": "bun node_modules/electron/install.js"
+  },
+  "devDependencies": {
+    "electron": "^35.7.5"
+  },
+  "trustedDependencies": [
+    "electron"
+  ]
+}
