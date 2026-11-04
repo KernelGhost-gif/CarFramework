@@ -11,3 +11,5 @@ To launch CarView from the CarFramework repository root (after installing Bun):
 Alternatively, run `bun run start` from this folder. Open **Connection**, check the detected keys and Python executable, then click **Start receiver** before starting the sender. Install packages once with `bun install` from this folder or via `./setup.sh` at the repository root.
 
 For help, see [troubleshooting](../docs/troubleshooting.md).
+
+CarView uses Bun for package installation and scripts. Its `package.json` and `bun.lock` are required by Bun; Electron also provides the Node-compatible APIs used by the desktop process.
