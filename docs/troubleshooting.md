@@ -17,7 +17,7 @@
 6. Verify AVIF encoding with `python -c "import cv2; print(cv2.haveImageWriter('.avif'))"`. The sender requires an OpenCV build with AVIF support.
 7. An encrypted frame larger than the UDP datagram limit cannot be sent by the current sender. Reduce the capture resolution or encoding quality if the sender reports a message-size error.
 
-Do not run the original `reciever.py` and CarView receiver simultaneously on the same machine: both bind the same ports. CarView's receiver has not been verified against live hardware and does not operate the vehicle controls.
+CarView's receiver has not been verified against live hardware and does not operate the vehicle controls.
 
 ## Model files
 
